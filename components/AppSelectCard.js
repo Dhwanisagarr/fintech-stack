@@ -85,3 +85,23 @@ export function ChipOption({ icon: Icon, label, selected, onClick }) {
     </motion.button>
   )
 }
+
+export function StepIndicator({ currentStep, totalSteps }) {
+  return (
+    <div className="flex items-center justify-center gap-2">
+      {Array.from({ length: totalSteps }, (_, i) => i + 1).map((stepNum) => (
+        <div
+          key={stepNum}
+          className={cn(
+            'w-2.5 h-2.5 rounded-full transition-all duration-300',
+            stepNum === currentStep
+              ? 'bg-emerald-500 w-8 rounded-full'
+              : stepNum < currentStep
+                ? 'bg-emerald-500/60'
+                : 'bg-neutral-700'
+          )}
+        />
+      ))}
+    </div>
+  )
+}

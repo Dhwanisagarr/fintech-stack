@@ -2,10 +2,11 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
+import { ArrowLeft, ArrowRight, Sparkles, CheckCircle2 } from 'lucide-react'
 import { supabase } from '@/lib/supabase'
 import Navbar from '@/components/Navbar'
 import PageTransition from '@/components/PageTransition'
-import { OptionCard, ChipOption, AppSelectCard } from '@/components/AppSelectCard'
+import { OptionCard, ChipOption, AppSelectCard, StepIndicator } from '@/components/AppSelectCard'
 import {
   USER_TYPES,
   SPENDING_HABITS,
@@ -15,6 +16,14 @@ import {
 } from '@/lib/onboarding-data'
 import { APP_CATEGORIES, getAppsByCategory } from '@/lib/apps'
 import { cn } from '@/lib/utils'
+
+const STEP_TITLES = [
+  { title: 'Who are you?', subtitle: 'This helps us personalize your recommendations' },
+  { title: 'What do you spend on?', subtitle: 'Select all that apply to your lifestyle' },
+  { title: 'What matters most?', subtitle: 'This shapes your stack priorities' },
+  { title: 'Your current apps', subtitle: 'Select apps you already use' },
+  { title: 'Your financial goal', subtitle: 'What are you trying to achieve?' },
+]
 
 export default function OnboardingPage() {
   const router = useRouter()
@@ -28,8 +37,8 @@ export default function OnboardingPage() {
     financial_goals: '',
   })
 
-  const handleNext = () => setStep((s) => s + 1)
-  const handleBack = () => setStep((s) => s - 1)
+  const handleNext = () => setStep((s) => Math.min(s + 1, 5))
+  const handleBack = () => setStep((s) => Math.max(s - 1, 1))
 
   const handleSubmit = async (goalValue) => {
     setLoading(true)
@@ -67,145 +76,270 @@ export default function OnboardingPage() {
 
   const toggleApp = (appName) => toggleArray('existing_apps', appName)
 
+  const currentStepData = STEP_TITLES[step - 1]
+
   return (
     <PageTransition className="min-h-screen px-4 py-8 md:px-6">
-      <Navbar backLabel="← Back to Home" backHref="/" />
+      <Navbar backLabel="Back to Home" backHref="/" />
 
-      <div className="max-w-4xl mx-auto mt-28 md:mt-32 pb-16">
-        <div className="mb-10">
-          <div className="flex justify-between mb-2 text-xs text-neutral-500">
-            {['20%', '40%', '60%', '80%', '100%'].map((pct, i) => (
-              <span key={pct} className={cn(i + 1 <= step && 'text-emerald-400 font-semibold')}>{pct}</span>
-            ))}
-          </div>
-          <div className="h-2 bg-[#0b0f0b] rounded-full overflow-hidden border border-emerald-500/10">
+      <div className="max-w-4xl mx-auto mt-24 md:mt-28 pb-16">
+        {/* Progress Section */}
+        <motion.div 
+          className="mb-10"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          {/* Premium Progress Bar */}
+          <div className="progress-bar-premium h-2 mb-6">
             <motion.div
+              className="progress-bar-fill h-full"
               initial={{ width: 0 }}
               animate={{ width: `${step * 20}%` }}
               transition={{ duration: 0.5, ease: 'easeOut' }}
-              className="h-full bg-gradient-to-r from-emerald-600 via-green-500 to-emerald-400 shadow-glow-sm"
             />
           </div>
-          <p className="text-center mt-3 text-neutral-500 text-sm">Step {step} of 5</p>
-        </div>
+          
+          {/* Step indicator dots */}
+          <StepIndicator currentStep={step} totalSteps={5} />
+          
+          {/* Step text */}
+          <p className="text-center mt-4 text-neutral-500 text-sm font-medium">
+            Step {step} of 5
+          </p>
+        </motion.div>
 
         <AnimatePresence mode="wait">
+          {/* Step 1: User Type */}
           {step === 1 && (
             <motion.div
               key="s1"
-              initial={{ opacity: 0, x: 30 }}
+              initial={{ opacity: 0, x: 40 }}
               animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
+              exit={{ opacity: 0, x: -40 }}
               transition={{ duration: 0.4 }}
             >
-              <h2 className="text-3xl md:text-4xl font-display font-bold text-center mb-2">What describes you best?</h2>
-              <p className="text-neutral-400 text-center mb-8">Tailored recommendations for your situation</p>
+              <StepHeader {...currentStepData} />
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {USER_TYPES.map((opt) => (
-                  <OptionCard
+                {USER_TYPES.map((opt, i) => (
+                  <motion.div
                     key={opt.value}
-                    icon={opt.icon}
-                    label={opt.label}
-                    description={opt.description}
-                    selected={data.user_type === opt.value}
-                    onClick={() => {
-                      setData({ ...data, user_type: opt.value })
-                      handleNext()
-                    }}
-                  />
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.05 }}
+                  >
+                    <OptionCard
+                      icon={opt.icon}
+                      label={opt.label}
+                      description={opt.description}
+                      selected={data.user_type === opt.value}
+                      onClick={() => {
+                        setData({ ...data, user_type: opt.value })
+                        setTimeout(handleNext, 300)
+                      }}
+                    />
+                  </motion.div>
                 ))}
               </div>
             </motion.div>
           )}
 
+          {/* Step 2: Spending Habits */}
           {step === 2 && (
-            <motion.div key="s2" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-              <h2 className="text-3xl md:text-4xl font-display font-bold text-center mb-2">What do you spend on?</h2>
-              <p className="text-neutral-400 text-center mb-8">Select all that apply</p>
+            <motion.div 
+              key="s2" 
+              initial={{ opacity: 0, x: 40 }} 
+              animate={{ opacity: 1, x: 0 }} 
+              exit={{ opacity: 0, x: -40 }}
+            >
+              <StepHeader {...currentStepData} />
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                {SPENDING_HABITS.map((opt) => (
-                  <ChipOption
+                {SPENDING_HABITS.map((opt, i) => (
+                  <motion.div
                     key={opt.value}
-                    icon={opt.icon}
-                    label={opt.label}
-                    selected={data.spending_habits.includes(opt.value)}
-                    onClick={() => toggleArray('spending_habits', opt.value)}
-                  />
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: i * 0.03 }}
+                  >
+                    <ChipOption
+                      icon={opt.icon}
+                      label={opt.label}
+                      selected={data.spending_habits.includes(opt.value)}
+                      onClick={() => toggleArray('spending_habits', opt.value)}
+                    />
+                  </motion.div>
                 ))}
               </div>
+              
+              {/* Selection count badge */}
+              {data.spending_habits.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="mt-6 text-center"
+                >
+                  <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm">
+                    <CheckCircle2 className="w-4 h-4" />
+                    {data.spending_habits.length} selected
+                  </span>
+                </motion.div>
+              )}
+              
+              <NavButtons onBack={handleBack} onNext={handleNext} canProceed={data.spending_habits.length > 0} />
+            </motion.div>
+          )}
+
+          {/* Step 3: Priorities */}
+          {step === 3 && (
+            <motion.div 
+              key="s3" 
+              initial={{ opacity: 0, x: 40 }} 
+              animate={{ opacity: 1, x: 0 }} 
+              exit={{ opacity: 0, x: -40 }}
+            >
+              <StepHeader {...currentStepData} />
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+                {PRIORITIES.map((opt, i) => (
+                  <motion.div
+                    key={opt.value}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: i * 0.03 }}
+                  >
+                    <ChipOption
+                      icon={opt.icon}
+                      label={opt.label}
+                      selected={data.priorities === opt.value}
+                      onClick={() => {
+                        setData({ ...data, priorities: opt.value })
+                        setTimeout(handleNext, 300)
+                      }}
+                    />
+                  </motion.div>
+                ))}
+              </div>
+              <div className="mt-10">
+                <button 
+                  onClick={handleBack} 
+                  className="flex items-center gap-2 text-neutral-400 hover:text-emerald-400 transition-colors"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  Back
+                </button>
+              </div>
+            </motion.div>
+          )}
+
+          {/* Step 4: Existing Apps */}
+          {step === 4 && (
+            <motion.div 
+              key="s4" 
+              initial={{ opacity: 0, x: 40 }} 
+              animate={{ opacity: 1, x: 0 }} 
+              exit={{ opacity: 0, x: -40 }}
+            >
+              <StepHeader {...currentStepData} />
+              
+              {ONBOARDING_APP_CATEGORIES.map((cat, catIndex) => (
+                <motion.div 
+                  key={cat} 
+                  className="mb-8"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: catIndex * 0.1 }}
+                >
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-1 h-5 rounded-full bg-gradient-to-b from-emerald-400 to-green-500" />
+                    <h3 className="text-emerald-400 text-xs font-semibold uppercase tracking-wider">
+                      {APP_CATEGORIES[cat]}
+                    </h3>
+                    <span className="text-neutral-600 text-xs">
+                      ({getAppsByCategory(cat).length} apps)
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-3">
+                    {getAppsByCategory(cat).map((app, i) => (
+                      <motion.div
+                        key={app.id}
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: i * 0.02 }}
+                      >
+                        <AppSelectCard
+                          app={app}
+                          compact
+                          selected={data.existing_apps.includes(app.name)}
+                          onClick={() => toggleApp(app.name)}
+                        />
+                      </motion.div>
+                    ))}
+                  </div>
+                </motion.div>
+              ))}
+              
+              {/* Selection count */}
+              {data.existing_apps.length > 0 && (
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-center mb-6"
+                >
+                  <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm">
+                    <CheckCircle2 className="w-4 h-4" />
+                    {data.existing_apps.length} apps selected
+                  </span>
+                </motion.div>
+              )}
+              
               <NavButtons onBack={handleBack} onNext={handleNext} />
             </motion.div>
           )}
 
-          {step === 3 && (
-            <motion.div key="s3" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-              <h2 className="text-3xl md:text-4xl font-display font-bold text-center mb-2">What matters most?</h2>
-              <p className="text-neutral-400 text-center mb-8">This shapes your stack focus</p>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
-                {PRIORITIES.map((opt) => (
-                  <ChipOption
-                    key={opt.value}
-                    icon={opt.icon}
-                    label={opt.label}
-                    selected={data.priorities === opt.value}
-                    onClick={() => {
-                      setData({ ...data, priorities: opt.value })
-                      handleNext()
-                    }}
-                  />
-                ))}
-              </div>
-              <div className="mt-8">
-                <button onClick={handleBack} className="text-neutral-400 hover:text-emerald-400 transition-colors">← Back</button>
-              </div>
-            </motion.div>
-          )}
-
-          {step === 4 && (
-            <motion.div key="s4" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-              <h2 className="text-3xl md:text-4xl font-display font-bold text-center mb-2">Apps you already use</h2>
-              <p className="text-neutral-400 text-center mb-8">Select all — grouped by category</p>
-              {ONBOARDING_APP_CATEGORIES.map((cat) => (
-                <div key={cat} className="mb-8">
-                  <h3 className="text-emerald-400 text-xs font-semibold uppercase tracking-wider mb-4">
-                    {APP_CATEGORIES[cat]}
-                  </h3>
-                  <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3">
-                    {getAppsByCategory(cat).map((app) => (
-                      <AppSelectCard
-                        key={app.id}
-                        app={app}
-                        compact
-                        selected={data.existing_apps.includes(app.name)}
-                        onClick={() => toggleApp(app.name)}
-                      />
-                    ))}
-                  </div>
-                </div>
-              ))}
-              <NavButtons onBack={handleBack} onNext={handleNext} nextClass="bg-emerald-500 hover:bg-emerald-400 text-[#050505]" />
-            </motion.div>
-          )}
-
+          {/* Step 5: Financial Goals */}
           {step === 5 && (
-            <motion.div key="s5" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-              <h2 className="text-3xl md:text-4xl font-display font-bold text-center mb-2">Your financial goal</h2>
-              <p className="text-neutral-400 text-center mb-8">What are you trying to improve?</p>
+            <motion.div 
+              key="s5" 
+              initial={{ opacity: 0, x: 40 }} 
+              animate={{ opacity: 1, x: 0 }} 
+              exit={{ opacity: 0, x: -40 }}
+            >
+              <StepHeader {...currentStepData} />
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {FINANCIAL_GOALS.map((opt) => (
-                  <OptionCard
+                {FINANCIAL_GOALS.map((opt, i) => (
+                  <motion.div
                     key={opt.value}
-                    icon={opt.icon}
-                    label={opt.label}
-                    description={opt.description}
-                    selected={data.financial_goals === opt.value}
-                    onClick={() => !loading && handleSubmit(opt.value)}
-                  />
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.08 }}
+                  >
+                    <OptionCard
+                      icon={opt.icon}
+                      label={opt.label}
+                      description={opt.description}
+                      selected={data.financial_goals === opt.value}
+                      onClick={() => !loading && handleSubmit(opt.value)}
+                    />
+                  </motion.div>
                 ))}
               </div>
-              <div className="flex justify-between mt-8 items-center">
-                <button onClick={handleBack} className="text-neutral-400 hover:text-emerald-400">← Back</button>
-                {loading && <span className="text-emerald-400 animate-pulse text-sm">Saving your preferences...</span>}
+              
+              <div className="flex justify-between items-center mt-10">
+                <button 
+                  onClick={handleBack} 
+                  className="flex items-center gap-2 text-neutral-400 hover:text-emerald-400 transition-colors"
+                >
+                  <ArrowLeft className="w-4 h-4" />
+                  Back
+                </button>
+                {loading && (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="flex items-center gap-3 text-emerald-400"
+                  >
+                    <Sparkles className="w-5 h-5 animate-pulse" />
+                    <span className="text-sm font-medium">Building your stack...</span>
+                  </motion.div>
+                )}
               </div>
             </motion.div>
           )}
@@ -215,19 +349,45 @@ export default function OnboardingPage() {
   )
 }
 
-function NavButtons({ onBack, onNext, nextClass }) {
+function StepHeader({ title, subtitle }) {
   return (
-    <div className="flex justify-between mt-10 gap-4">
-      <button onClick={onBack} className="text-neutral-400 hover:text-emerald-400 px-4 py-2">← Back</button>
-      <button
+    <motion.div
+      initial={{ opacity: 0, y: -10 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="text-center mb-10"
+    >
+      <h2 className="text-3xl md:text-4xl font-display font-bold text-white mb-3">{title}</h2>
+      <p className="text-neutral-400">{subtitle}</p>
+    </motion.div>
+  )
+}
+
+function NavButtons({ onBack, onNext, canProceed = true }) {
+  return (
+    <div className="flex justify-between items-center mt-10 pt-6 border-t border-emerald-500/10">
+      <motion.button 
+        whileHover={{ x: -4 }}
+        onClick={onBack} 
+        className="flex items-center gap-2 text-neutral-400 hover:text-emerald-400 transition-colors px-4 py-2"
+      >
+        <ArrowLeft className="w-4 h-4" />
+        Back
+      </motion.button>
+      <motion.button
+        whileHover={{ scale: 1.02, x: 4 }}
+        whileTap={{ scale: 0.98 }}
         onClick={onNext}
+        disabled={!canProceed}
         className={cn(
-          'px-8 py-3 rounded-full font-semibold transition-all shadow-glow-sm',
-          nextClass || 'bg-emerald-500 hover:bg-emerald-400 text-[#050505]'
+          'flex items-center gap-2 px-8 py-3 rounded-full font-semibold transition-all shadow-glow-sm',
+          canProceed
+            ? 'bg-gradient-to-r from-emerald-500 to-green-400 text-[#050505] hover:shadow-glow'
+            : 'bg-neutral-800 text-neutral-500 cursor-not-allowed shadow-none'
         )}
       >
-        Next →
-      </button>
+        Continue
+        <ArrowRight className="w-4 h-4" />
+      </motion.button>
     </div>
   )
 }

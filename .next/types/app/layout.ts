@@ -1,4 +1,4 @@
-// File: /Users/dhwanisagar/Documents/fintech/fintech-stack-optimizer/app/layout.js
+// File: /vercel/share/v0-project/app/layout.js
 import * as entry from '../../../app/layout.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 

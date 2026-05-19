@@ -1,7 +1,25 @@
 'use client'
+import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 
 export default function AnimatedBackground() {
+  const [isMounted, setIsMounted] = useState(false)
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
+
+  if (!isMounted) {
+    return (
+      <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
+        <div className="absolute inset-0 bg-grid opacity-40" />
+        <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-emerald-500/20 blur-[120px]" />
+        <div className="absolute top-1/3 -right-24 w-80 h-80 rounded-full bg-green-400/15 blur-[100px]" />
+        <div className="absolute bottom-0 left-1/4 w-[500px] h-[500px] rounded-full bg-emerald-600/10 blur-[140px]" />
+      </div>
+    )
+  }
+
   return (
     <div className="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
       <motion.div
