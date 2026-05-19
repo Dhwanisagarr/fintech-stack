@@ -78,20 +78,3 @@ h1, h2, h3, h4 {
 .animate-marquee {
   animation: marquee 40s linear infinite;
 }
-
-.progress-bar-premium {
-  background: linear-gradient(90deg, rgba(34, 197, 94, 0.1) 0%, rgba(74, 222, 128, 0.1) 100%);
-  border-radius: 999px;
-  overflow: hidden;
-  border: 1px solid rgba(34, 197, 94, 0.2);
-}
-
-.progress-bar-fill {
-  background: linear-gradient(90deg, #10b981 0%, #4ade80 50%, #22c55e 100%);
-  border-radius: 999px;
-  box-shadow: 0 0 20px rgba(34, 197, 94, 0.5);
-}
-
-.feature-tag {
-  @apply px-3 py-1.5 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20;
-}
