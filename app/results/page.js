@@ -22,13 +22,13 @@ function ScoreRing({ value, label, delay }) {
     >
       <div className="relative w-24 h-24">
         <svg className="w-full h-full -rotate-90" viewBox="0 0 80 80">
-          <circle cx="40" cy="40" r="36" fill="none" stroke="#0b0f0b" strokeWidth="6" />
+          <circle cx="40" cy="40" r="36" fill="none" stroke="#18181b" strokeWidth="6" />
           <motion.circle
             cx="40"
             cy="40"
             r="36"
             fill="none"
-            stroke="url(#greenGrad)"
+            stroke="url(#monoGrad)"
             strokeWidth="6"
             strokeLinecap="round"
             strokeDasharray={circumference}
@@ -37,17 +37,17 @@ function ScoreRing({ value, label, delay }) {
             transition={{ delay: delay + 0.2, duration: 1 }}
           />
           <defs>
-            <linearGradient id="greenGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#10b981" />
-              <stop offset="100%" stopColor="#4ade80" />
+            <linearGradient id="monoGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#71717a" />
+              <stop offset="100%" stopColor="#ffffff" />
             </linearGradient>
           </defs>
         </svg>
-        <span className="absolute inset-0 flex items-center justify-center text-lg font-bold text-emerald-400">
+        <span className="absolute inset-0 flex items-center justify-center text-lg font-bold text-white">
           {value}%
         </span>
       </div>
-      <span className="text-xs text-neutral-400 mt-2 text-center">{label}</span>
+      <span className="text-xs text-zinc-400 mt-2 text-center">{label}</span>
     </motion.div>
   )
 }
@@ -92,21 +92,21 @@ export default function ResultsPage() {
           animate={{ opacity: 1, scale: 1 }}
           className="glass-card p-8 md:p-12 mb-12 relative overflow-hidden"
         >
-          <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 blur-[80px] rounded-full pointer-events-none" />
+          <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 blur-[80px] rounded-full pointer-events-none" />
           <div className="relative text-center">
-            <p className="text-neutral-400 text-sm uppercase tracking-widest mb-2">Stack Efficiency Score</p>
+            <p className="text-zinc-400 text-sm uppercase tracking-widest mb-2">Stack Efficiency Score</p>
             <motion.div
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ delay: 0.2 }}
-              className="text-7xl md:text-8xl font-display font-bold bg-gradient-to-r from-emerald-400 to-green-300 bg-clip-text text-transparent mb-4"
+              className="text-7xl md:text-8xl font-display font-bold bg-gradient-to-r from-white via-zinc-200 to-zinc-400 bg-clip-text text-transparent mb-4"
             >
               {score.overall}%
             </motion.div>
-            <div className="flex items-center justify-center gap-2 text-emerald-400/90 text-sm mb-10">
-              <Sparkles className="w-4 h-4" />
+            <div className="flex items-center justify-center gap-2 text-zinc-300 text-sm mb-10">
+              <Sparkles className="w-4 h-4 text-white" />
               <span>Optimized for your lifestyle</span>
-              <Sparkles className="w-4 h-4" />
+              <Sparkles className="w-4 h-4 text-white" />
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
               <ScoreRing value={score.breakdown.savings} label="Savings" delay={0.3} />
@@ -114,7 +114,7 @@ export default function ResultsPage() {
               <ScoreRing value={score.breakdown.simplicity} label="Simplicity" delay={0.5} />
               <ScoreRing value={score.breakdown.investment} label="Investment" delay={0.6} />
             </div>
-            <p className="mt-8 text-neutral-500 text-sm max-w-md mx-auto">
+            <p className="mt-8 text-zinc-500 text-sm max-w-md mx-auto">
               Based on your spending habits and priorities — AI-matched for maximum compatibility
             </p>
           </div>
@@ -127,7 +127,7 @@ export default function ResultsPage() {
           className="text-center mb-10"
         >
           <h2 className="text-3xl md:text-4xl font-display font-bold">Your Personalized Fintech Stack</h2>
-          <p className="text-neutral-400 mt-2">5 apps · curated for you</p>
+          <p className="text-zinc-400 mt-2">5 apps · curated for you</p>
         </motion.div>
 
         {cards.map((rec, i) => (
@@ -166,7 +166,7 @@ export default function ResultsPage() {
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
             onClick={() => router.push('/onboarding')}
-            className="px-8 py-4 rounded-full border border-neutral-700 text-neutral-300 font-semibold hover:border-emerald-500/40 hover:text-emerald-400 transition-all flex items-center justify-center gap-2"
+            className="px-8 py-4 rounded-full border border-white/20 text-white font-semibold hover:border-white hover:bg-white/5 transition-all flex items-center justify-center gap-2"
           >
             <RotateCcw className="w-5 h-5" />
             Retake Quiz
@@ -176,3 +176,4 @@ export default function ResultsPage() {
     </PageTransition>
   )
 }
+

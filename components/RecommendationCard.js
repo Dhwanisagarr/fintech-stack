@@ -13,70 +13,70 @@ export default function RecommendationCard({ data, index }) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.1 }}
       whileHover={{ y: -4 }}
-      className="glass-card p-6 md:p-8 mb-6 hover:shadow-glow-sm"
+      className="glass-card p-6 md:p-8 mb-6 hover:border-white/20 hover:shadow-lg"
     >
-      <div className="flex flex-col md:flex-row gap-6">
+      <div className="flex flex-col md:flex-row items-start justify-between gap-6">
         <div className="flex items-start gap-4">
           <AppLogo app={app} size={64} />
           <div>
             <div className="flex flex-wrap items-center gap-2 mb-2">
               <h3 className="text-2xl font-bold text-white">{data.app}</h3>
-              <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+              <span className="px-2.5 py-0.5 rounded-full text-xs font-semibold bg-white/10 text-white border border-white/20 h-fit">
                 {data.bestFor}
               </span>
             </div>
-            <div className="flex items-center gap-3 text-sm text-neutral-400 mb-2">
-              <span className="flex items-center gap-1 text-amber-400">
-                <Star className="w-4 h-4 fill-amber-400" />
+            <div className="flex items-center gap-3 text-sm text-zinc-400 mb-2">
+              <span className="flex items-center gap-1 text-white font-medium">
+                <Star className="w-4 h-4 text-white fill-white" />
                 {data.rating}
               </span>
-              <span className="text-emerald-400 font-semibold">{data.compatibility}% match</span>
+              <span className="text-white font-semibold">{data.compatibility}% match</span>
             </div>
-            <p className="text-xs text-emerald-500/80 flex items-center gap-1">
-              <Sparkles className="w-3 h-3" />
+            <p className="text-xs text-zinc-400 flex items-center gap-1">
+              <Sparkles className="w-3 h-3 text-white" />
               {data.aiInsight}
             </p>
           </div>
         </div>
-        <div className="md:ml-auto flex flex-wrap gap-2">
+        <div className="md:ml-auto flex flex-wrap items-center gap-2 h-fit">
           {data.tags?.map((tag) => (
-            <span key={tag} className="px-3 py-1 rounded-full text-xs bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">
+            <span key={tag} className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-zinc-900/90 text-zinc-300 border border-white/10 shrink-0 h-fit">
               {tag}
             </span>
           ))}
         </div>
       </div>
 
-      <p className="mt-5 text-neutral-300 leading-relaxed">
-        <span className="text-emerald-400 font-semibold">Why: </span>
+      <p className="mt-5 text-zinc-300 leading-relaxed">
+        <span className="text-white font-semibold">Why: </span>
         {data.reason}
       </p>
 
       <div className="grid md:grid-cols-2 gap-6 mt-6">
         <div>
-          <span className="text-emerald-400 font-semibold text-sm">Pros</span>
+          <span className="text-white font-semibold text-sm">Pros</span>
           <ul className="mt-2 space-y-1.5">
             {data.pros.map((pro, i) => (
-              <li key={i} className="text-sm text-neutral-300 flex gap-2">
-                <span className="text-emerald-500">+</span> {pro}
+              <li key={i} className="text-sm text-zinc-300 flex gap-2">
+                <span className="text-white font-bold">+</span> {pro}
               </li>
             ))}
           </ul>
         </div>
         <div>
-          <span className="text-amber-400/90 font-semibold text-sm">Tradeoffs</span>
+          <span className="text-zinc-400 font-semibold text-sm">Tradeoffs</span>
           <ul className="mt-2 space-y-1.5">
             {data.tradeoffs.map((trade, i) => (
-              <li key={i} className="text-sm text-neutral-400 flex gap-2">
-                <span className="text-amber-500">−</span> {trade}
+              <li key={i} className="text-sm text-zinc-400 flex gap-2">
+                <span className="text-zinc-500 font-bold">−</span> {trade}
               </li>
             ))}
           </ul>
         </div>
       </div>
 
-      <p className="mt-4 text-sm text-neutral-500">
-        <span className="text-emerald-400/80 font-medium">Alternative: </span>
+      <p className="mt-4 text-sm text-zinc-500">
+        <span className="text-zinc-400 font-medium">Alternative: </span>
         {data.alternative}
       </p>
 
@@ -85,7 +85,7 @@ export default function RecommendationCard({ data, index }) {
           href={data.website}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-emerald-500 text-[#050505] font-semibold text-sm hover:bg-emerald-400 transition-all shadow-glow-sm"
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white text-black font-semibold text-sm hover:bg-zinc-200 transition-all shadow-md"
         >
           <Download className="w-4 h-4" />
           Get App
@@ -94,7 +94,7 @@ export default function RecommendationCard({ data, index }) {
           href={data.website}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-emerald-500/30 text-emerald-400 font-semibold text-sm hover:bg-emerald-500/10 transition-all"
+          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-white/20 text-white font-semibold text-sm hover:bg-white/10 transition-all"
         >
           <ExternalLink className="w-4 h-4" />
           Visit Website
@@ -103,3 +103,4 @@ export default function RecommendationCard({ data, index }) {
     </motion.article>
   )
 }
+

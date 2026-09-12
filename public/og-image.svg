@@ -1,0 +1,134 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <!-- Dark Gradient Background -->
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#0c0c0e"/>
+      <stop offset="50%" stop-color="#040405"/>
+      <stop offset="100%" stop-color="#000000"/>
+    </linearGradient>
+
+    <!-- Emerald Glow Filter -->
+    <radialGradient id="emeraldGlow" cx="0.5" cy="0.3" r="0.6">
+      <stop offset="0%" stop-color="#10b981" stop-opacity="0.18"/>
+      <stop offset="60%" stop-color="#059669" stop-opacity="0.05"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+    </radialGradient>
+
+    <!-- Dot Pattern -->
+    <pattern id="dotPattern" width="40" height="40" patternUnits="userSpaceOnUse">
+      <circle cx="20" cy="20" r="1.5" fill="#3f3f46" opacity="0.35"/>
+    </pattern>
+
+    <!-- Glass Card Gradient -->
+    <linearGradient id="cardGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#18181b" stop-opacity="0.7"/>
+      <stop offset="100%" stop-color="#09090b" stop-opacity="0.9"/>
+    </linearGradient>
+
+    <!-- Sparkle Icon Gradient -->
+    <linearGradient id="sparkleGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#d4d4d8"/>
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#34d399"/>
+      <stop offset="100%" stop-color="#10b981"/>
+    </linearGradient>
+  </defs>
+
+  <!-- 1. Background Base -->
+  <rect width="1200" height="630" fill="url(#bgGrad)"/>
+  
+  <!-- 2. Ambient Glow Overlay -->
+  <rect width="1200" height="630" fill="url(#emeraldGlow)"/>
+
+  <!-- 3. Dot Grid Pattern -->
+  <rect width="1200" height="630" fill="url(#dotPattern)"/>
+
+  <!-- 4. Subtle Border Frame -->
+  <rect x="24" y="24" width="1152" height="582" rx="24" fill="none" stroke="#27272a" stroke-width="2" opacity="0.8"/>
+
+  <!-- 5. Top Brand Badge Pill -->
+  <g transform="translate(420, 80)">
+    <rect width="360" height="42" rx="21" fill="#18181b" stroke="#3f3f46" stroke-width="1.5"/>
+    <!-- Tiny Sparkle Icon inside Badge -->
+    <path d="M 445,95 C 445,101 440,106 434,106 C 440,106 445,111 445,117 C 445,111 450,106 456,106 C 450,106 445,101 445,95 Z" fill="#10b981"/>
+    <text x="470" y="106" fill="#e4e4e7" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="14" font-weight="600" letter-spacing="1">STACK OPTIMIZER · MONEY ECOSYSTEM</text>
+  </g>
+
+  <!-- 6. Brand Logo Mark + Main Title -->
+  <g transform="translate(600, 220)">
+    <!-- Logo Icon Box -->
+    <rect x="-260" y="-42" width="68" height="68" rx="20" fill="#ffffff" filter="drop-shadow(0 8px 16px rgba(0,0,0,0.5))"/>
+    <!-- Sparkle Symbol -->
+    <path d="M -226,-28 C -226,-15 -214,-3 -201,-3 C -214,-3 -226,9 -226,22 C -226,9 -238,-3 -251,-3 C -238,-3 -226,-15 -226,-28 Z" fill="#09090b"/>
+
+    <!-- Headline Text -->
+    <text x="-170" y="8" fill="#ffffff" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="56" font-weight="800" letter-spacing="-1.5">STACK OPTIMIZER</text>
+  </g>
+
+  <!-- 7. Subtitle -->
+  <text x="600" y="300" fill="#a1a1aa" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="24" font-weight="500" text-anchor="middle">
+    Build a fintech stack that actually fits you.
+  </text>
+
+  <!-- 8. Five Pillar Cards Container (Visual Stack Representation) -->
+  <g transform="translate(80, 370)">
+    
+    <!-- Pillar 1: Payments -->
+    <g transform="translate(0, 0)">
+      <rect width="192" height="150" rx="16" fill="url(#cardGrad)" stroke="#27272a" stroke-width="1.5"/>
+      <circle cx="36" cy="36" r="16" fill="#27272a"/>
+      <text x="36" y="41" font-size="16" text-anchor="middle">⚡</text>
+      <text x="36" y="84" fill="#10b981" font-family="-apple-system, sans-serif" font-size="11" font-weight="700" letter-spacing="1">PAYMENTS</text>
+      <text x="36" y="108" fill="#ffffff" font-family="-apple-system, sans-serif" font-size="14" font-weight="700">UPI &amp; Daily</text>
+      <text x="36" y="128" fill="#71717a" font-family="-apple-system, sans-serif" font-size="12">GPay · PhonePe</text>
+    </g>
+
+    <!-- Pillar 2: Banking -->
+    <g transform="translate(212, 0)">
+      <rect width="192" height="150" rx="16" fill="url(#cardGrad)" stroke="#27272a" stroke-width="1.5"/>
+      <circle cx="36" cy="36" r="16" fill="#27272a"/>
+      <text x="36" y="41" font-size="16" text-anchor="middle">🏦</text>
+      <text x="36" y="84" fill="#3b82f6" font-family="-apple-system, sans-serif" font-size="11" font-weight="700" letter-spacing="1">BANKING</text>
+      <text x="36" y="108" fill="#ffffff" font-family="-apple-system, sans-serif" font-size="14" font-weight="700">Salary &amp; Pots</text>
+      <text x="36" y="128" fill="#71717a" font-family="-apple-system, sans-serif" font-size="12">HDFC · Fi Money</text>
+    </g>
+
+    <!-- Pillar 3: Investing -->
+    <g transform="translate(424, 0)">
+      <rect width="192" height="150" rx="16" fill="url(#cardGrad)" stroke="#10b981" stroke-width="2"/>
+      <circle cx="36" cy="36" r="16" fill="#10b981" fill-opacity="0.2"/>
+      <text x="36" y="41" font-size="16" text-anchor="middle">📈</text>
+      <text x="36" y="84" fill="#34d399" font-family="-apple-system, sans-serif" font-size="11" font-weight="700" letter-spacing="1">INVESTING</text>
+      <text x="36" y="108" fill="#ffffff" font-family="-apple-system, sans-serif" font-size="14" font-weight="700">Stocks &amp; SIPs</text>
+      <text x="36" y="128" fill="#a1a1aa" font-family="-apple-system, sans-serif" font-size="12">Zerodha · Groww</text>
+    </g>
+
+    <!-- Pillar 4: Credit -->
+    <g transform="translate(636, 0)">
+      <rect width="192" height="150" rx="16" fill="url(#cardGrad)" stroke="#27272a" stroke-width="1.5"/>
+      <circle cx="36" cy="36" r="16" fill="#27272a"/>
+      <text x="36" y="41" font-size="16" text-anchor="middle">💳</text>
+      <text x="36" y="84" fill="#a855f7" font-family="-apple-system, sans-serif" font-size="11" font-weight="700" letter-spacing="1">CREDIT</text>
+      <text x="36" y="108" fill="#ffffff" font-family="-apple-system, sans-serif" font-size="14" font-weight="700">Cards &amp; Rewards</text>
+      <text x="36" y="128" fill="#71717a" font-family="-apple-system, sans-serif" font-size="12">CRED · SBI Cashback</text>
+    </g>
+
+    <!-- Pillar 5: Travel -->
+    <g transform="translate(848, 0)">
+      <rect width="192" height="150" rx="16" fill="url(#cardGrad)" stroke="#27272a" stroke-width="1.5"/>
+      <circle cx="36" cy="36" r="16" fill="#27272a"/>
+      <text x="36" y="41" font-size="16" text-anchor="middle">✈️</text>
+      <text x="36" y="84" fill="#f59e0b" font-family="-apple-system, sans-serif" font-size="11" font-weight="700" letter-spacing="1">TRAVEL</text>
+      <text x="36" y="108" fill="#ffffff" font-family="-apple-system, sans-serif" font-size="14" font-weight="700">0% Forex Cards</text>
+      <text x="36" y="128" fill="#71717a" font-family="-apple-system, sans-serif" font-size="12">Niyo Global · Scapia</text>
+    </g>
+
+  </g>
+
+  <!-- 9. Footer Watermark -->
+  <text x="600" y="585" fill="#52525b" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="500" text-anchor="middle">
+    fintechstackoptimizer.vercel.app
+  </text>
+</svg>

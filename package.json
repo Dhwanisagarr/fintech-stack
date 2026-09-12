@@ -2,10 +2,15 @@
   "name": "fintech-stack-optimizer",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "validate-data": "node scripts/validate-data.js",
+    "test-recommendations": "node scripts/test-recommendations.js",
+    "test-advisor": "node scripts/test-advisor.js",
+    "generate-report": "node scripts/generate-recommendation-report.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.39.7",
@@ -19,8 +24,12 @@
     "tailwind-merge": "^2.2.1"
   },
   "devDependencies": {
+    "@types/node": "^22.20.2",
+    "@types/react": "^18.3.1",
+    "@types/react-dom": "^18.3.1",
     "autoprefixer": "^10.0.1",
     "postcss": "^8.5.14",
-    "tailwindcss": "^3.3.0"
+    "tailwindcss": "^3.3.0",
+    "typescript": "^5.9.3"
   }
 }

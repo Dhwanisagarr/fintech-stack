@@ -1,4 +1,4 @@
-// File: /Users/dhwanisagar/Documents/fintech/fintech-stack-optimizer/app/page.js
+// File: /Users/dhwanisagar/fintech stack/fintech-stack/app/page.js
 import * as entry from '../../../app/page.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 
