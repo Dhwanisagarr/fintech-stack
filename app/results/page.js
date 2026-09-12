@@ -1,14 +1,17 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Sparkles, Save, Share2, RotateCcw, Check } from 'lucide-react'
+import { Sparkles, Save, Share2, Download, RotateCcw, Check, Loader2 } from 'lucide-react'
+import { toBlob, toPng } from 'html-to-image'
 import { getRecommendations, calculateStackScore } from '@/lib/recommendations'
+import { getDbAppById } from '@/lib/apps-db'
 import Navbar from '@/components/Navbar'
 import PageTransition from '@/components/PageTransition'
 import LoadingScreen from '@/components/LoadingScreen'
 import RecommendationCard from '@/components/RecommendationCard'
+import AppLogo from '@/components/AppLogo'
 
 function ScoreRing({ value, label, delay }) {
   const circumference = 2 * Math.PI * 36
@@ -59,6 +62,8 @@ export default function ResultsPage() {
   const [recommendations, setRecommendations] = useState(null)
   const [score, setScore] = useState(null)
   const [toastMessage, setToastMessage] = useState(null)
+  const [isExporting, setIsExporting] = useState(false)
+  const exportCardRef = useRef(null)
 
   useEffect(() => {
     const raw = localStorage.getItem('userPreferences')
@@ -76,45 +81,97 @@ export default function ResultsPage() {
     setToastMessage(msg)
     setTimeout(() => {
       setToastMessage(null)
-    }, 2800)
+    }, 3200)
+  }
+
+  const generateStackImage = async () => {
+    if (!exportCardRef.current) return null
+    try {
+      const blob = await toBlob(exportCardRef.current, {
+        quality: 0.95,
+        pixelRatio: 2,
+        backgroundColor: '#09090b'
+      })
+      return blob
+    } catch (err) {
+      console.error('Failed to generate image blob:', err)
+      return null
+    }
+  }
+
+  const handleDownloadImage = async () => {
+    setIsExporting(true)
+    try {
+      const blob = await generateStackImage()
+      if (blob) {
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = `my-fintech-stack-${Date.now()}.png`
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+        URL.revokeObjectURL(url)
+        showToast('Stack card PNG downloaded!')
+      } else {
+        showToast('Failed to generate image card.')
+      }
+    } finally {
+      setIsExporting(false)
+    }
   }
 
   const handleShare = async () => {
+    setIsExporting(true)
     const origin = typeof window !== 'undefined' ? window.location.origin : 'https://fintechstackoptimizer.vercel.app'
     const shareUrl = `${origin}/results`
-    const shareData = {
-      title: 'Fintech Stack Optimizer',
-      text: `Check out my optimized fintech stack score (${score?.overall || 85}% efficiency) on Fintech Stack Optimizer!`,
-      url: shareUrl,
-    }
 
-    // 1. Try Native Web Share API if supported (mobile / modern browser)
-    if (typeof navigator !== 'undefined' && navigator.share) {
-      try {
-        await navigator.share(shareData)
-        showToast('Shared successfully!')
-        return
-      } catch (err) {
-        // User cancelled or share failed, fallback to clipboard copy
-        if (err.name === 'AbortError') return
-      }
-    }
-
-    // 2. Fallback: Copy to Clipboard
     try {
+      // Generate high resolution image file
+      const blob = await generateStackImage()
+      let sharedWithFile = false
+
+      if (blob) {
+        const imageFile = new File([blob], 'my-fintech-stack.png', { type: 'image/png' })
+        
+        // 1. Try Native Web Share API with File payload
+        if (typeof navigator !== 'undefined' && navigator.canShare && navigator.canShare({ files: [imageFile] })) {
+          try {
+            await navigator.share({
+              title: 'My Fintech Stack',
+              text: `Check out my optimized fintech stack (${score?.overall || 85}% score) on Fintech Stack Optimizer!`,
+              files: [imageFile],
+              url: shareUrl,
+            })
+            sharedWithFile = true
+            showToast('Stack image shared!')
+            return
+          } catch (shareErr) {
+            if (shareErr.name === 'AbortError') return
+          }
+        }
+      }
+
+      // 2. Fallback: Trigger PNG download & Copy URL to Clipboard
+      if (blob && !sharedWithFile) {
+        const url = URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = `my-fintech-stack-${Date.now()}.png`
+        document.body.appendChild(a)
+        a.click()
+        document.body.removeChild(a)
+        URL.revokeObjectURL(url)
+      }
+
       if (navigator.clipboard && navigator.clipboard.writeText) {
         await navigator.clipboard.writeText(shareUrl)
-      } else {
-        const input = document.createElement('input')
-        input.value = shareUrl
-        document.body.appendChild(input)
-        input.select()
-        document.execCommand('copy')
-        document.body.removeChild(input)
       }
-      showToast('Share link copied to clipboard!')
+      showToast('Image downloaded & share link copied to clipboard!')
     } catch (err) {
-      showToast('Could not copy link. Please copy URL from browser address bar.')
+      showToast('Share link copied to clipboard!')
+    } finally {
+      setIsExporting(false)
     }
   }
 
@@ -159,6 +216,8 @@ export default function ResultsPage() {
       </AnimatePresence>
 
       <div className="max-w-4xl mx-auto mt-28 md:mt-32 pb-20">
+        
+        {/* Main Score Hero Card */}
         <motion.div
           initial={{ opacity: 0, scale: 0.96 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -192,6 +251,7 @@ export default function ResultsPage() {
           </div>
         </motion.div>
 
+        {/* Section Heading */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
@@ -202,15 +262,17 @@ export default function ResultsPage() {
           <p className="text-zinc-400 mt-2">5 apps · curated for you</p>
         </motion.div>
 
+        {/* Recommendation Cards */}
         {cards.map((rec, i) => (
           <RecommendationCard key={rec.app} data={rec} index={i} />
         ))}
 
+        {/* Action Buttons */}
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.9 }}
-          className="flex flex-col md:flex-row gap-4 justify-center mt-12"
+          className="flex flex-col sm:flex-row flex-wrap gap-4 justify-center mt-12"
         >
           <motion.button
             whileHover={{ scale: 1.03 }}
@@ -219,17 +281,31 @@ export default function ResultsPage() {
             className="btn-primary flex items-center justify-center gap-2"
           >
             <Save className="w-5 h-5" />
-            Save My Stack
+            Save Stack
           </motion.button>
+          
           <motion.button
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
+            disabled={isExporting}
             onClick={handleShare}
-            className="btn-secondary flex items-center justify-center gap-2 cursor-pointer"
+            className="btn-secondary flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
           >
-            <Share2 className="w-5 h-5" />
-            Share Stack
+            {isExporting ? <Loader2 className="w-5 h-5 animate-spin" /> : <Share2 className="w-5 h-5" />}
+            {isExporting ? 'Preparing Image...' : 'Share Stack'}
           </motion.button>
+
+          <motion.button
+            whileHover={{ scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
+            disabled={isExporting}
+            onClick={handleDownloadImage}
+            className="px-6 py-4 rounded-full border border-zinc-700 bg-zinc-900/90 text-white font-semibold hover:border-white hover:bg-zinc-800 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+          >
+            <Download className="w-5 h-5 text-emerald-400" />
+            Download PNG Card
+          </motion.button>
+
           <motion.button
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
@@ -240,7 +316,68 @@ export default function ResultsPage() {
             Retake Quiz
           </motion.button>
         </motion.div>
+
       </div>
+
+      {/* Offscreen High-Res Export Card for PNG Generation */}
+      <div className="absolute top-[-9999px] left-[-9999px] pointer-events-none">
+        <div
+          ref={exportCardRef}
+          className="w-[720px] bg-black text-white p-10 rounded-3xl border border-zinc-800 font-sans shadow-2xl"
+          style={{ backgroundColor: '#09090b' }}
+        >
+          {/* Header */}
+          <div className="flex items-center justify-between border-b border-zinc-800 pb-6 mb-8">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-white text-black flex items-center justify-center font-bold">
+                <Sparkles className="w-6 h-6 text-black" />
+              </div>
+              <div>
+                <h1 className="text-xl font-bold text-white tracking-tight">STACK OPTIMIZER</h1>
+                <p className="text-xs text-zinc-400">Personalized Fintech Ecosystem</p>
+              </div>
+            </div>
+            <div className="px-3.5 py-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 text-emerald-400 text-xs font-semibold">
+              Verified Stack Result
+            </div>
+          </div>
+
+          {/* Hero Score */}
+          <div className="bg-zinc-900/90 rounded-2xl p-6 border border-zinc-800 text-center mb-8">
+            <p className="text-xs text-zinc-400 uppercase tracking-widest mb-1">Stack Efficiency Score</p>
+            <div className="text-6xl font-extrabold text-white mb-2">{score?.overall || 85}%</div>
+            <p className="text-xs text-emerald-400 font-medium">Matched for {preferences?.user_type || 'Salaried'} Lifestyle</p>
+          </div>
+
+          {/* 5 Stack Pillar Apps Grid */}
+          <div className="space-y-3 mb-8">
+            {cards.map((rec) => {
+              const appObj = getDbAppById(rec.appId)
+              return (
+                <div key={rec.app} className="flex items-center justify-between bg-zinc-900/60 rounded-xl p-3.5 border border-zinc-800/80">
+                  <div className="flex items-center gap-3">
+                    <AppLogo app={appObj || { name: rec.app, domain: rec.logo }} size={36} />
+                    <div>
+                      <h3 className="text-sm font-bold text-white">{rec.app}</h3>
+                      <p className="text-xs text-zinc-400">{rec.category}</p>
+                    </div>
+                  </div>
+                  <span className="text-xs font-bold px-3 py-1 rounded-full bg-zinc-800 text-zinc-200 border border-zinc-700">
+                    {rec.compatibility}% Fit
+                  </span>
+                </div>
+              )
+            })}
+          </div>
+
+          {/* Footer Link */}
+          <div className="pt-4 border-t border-zinc-800 flex items-center justify-between text-xs text-zinc-500">
+            <span>fintechstackoptimizer.vercel.app</span>
+            <span>Created by Dhwani Sagar</span>
+          </div>
+        </div>
+      </div>
+
     </PageTransition>
   )
 }
