@@ -1,8 +1,9 @@
 'use client'
+
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { motion } from 'framer-motion'
-import { Sparkles, Save, Share2, RotateCcw } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { Sparkles, Save, Share2, RotateCcw, Check } from 'lucide-react'
 import { getRecommendations, calculateStackScore } from '@/lib/recommendations'
 import Navbar from '@/components/Navbar'
 import PageTransition from '@/components/PageTransition'
@@ -57,6 +58,7 @@ export default function ResultsPage() {
   const [preferences, setPreferences] = useState(null)
   const [recommendations, setRecommendations] = useState(null)
   const [score, setScore] = useState(null)
+  const [toastMessage, setToastMessage] = useState(null)
 
   useEffect(() => {
     const raw = localStorage.getItem('userPreferences')
@@ -69,6 +71,59 @@ export default function ResultsPage() {
     setRecommendations(getRecommendations(prefs))
     setScore(calculateStackScore(prefs))
   }, [router])
+
+  const showToast = (msg) => {
+    setToastMessage(msg)
+    setTimeout(() => {
+      setToastMessage(null)
+    }, 2800)
+  }
+
+  const handleShare = async () => {
+    const origin = typeof window !== 'undefined' ? window.location.origin : 'https://fintechstackoptimizer.vercel.app'
+    const shareUrl = `${origin}/results`
+    const shareData = {
+      title: 'Fintech Stack Optimizer',
+      text: `Check out my optimized fintech stack score (${score?.overall || 85}% efficiency) on Fintech Stack Optimizer!`,
+      url: shareUrl,
+    }
+
+    // 1. Try Native Web Share API if supported (mobile / modern browser)
+    if (typeof navigator !== 'undefined' && navigator.share) {
+      try {
+        await navigator.share(shareData)
+        showToast('Shared successfully!')
+        return
+      } catch (err) {
+        // User cancelled or share failed, fallback to clipboard copy
+        if (err.name === 'AbortError') return
+      }
+    }
+
+    // 2. Fallback: Copy to Clipboard
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(shareUrl)
+      } else {
+        const input = document.createElement('input')
+        input.value = shareUrl
+        document.body.appendChild(input)
+        input.select()
+        document.execCommand('copy')
+        document.body.removeChild(input)
+      }
+      showToast('Share link copied to clipboard!')
+    } catch (err) {
+      showToast('Could not copy link. Please copy URL from browser address bar.')
+    }
+  }
+
+  const handleSave = () => {
+    if (typeof window !== 'undefined' && preferences) {
+      localStorage.setItem('savedFintechStack', JSON.stringify({ preferences, score, savedAt: new Date().toISOString() }))
+    }
+    showToast('Stack configuration saved locally!')
+  }
 
   if (!preferences || !recommendations || !score) {
     return <LoadingScreen message="Analyzing your fintech stack..." />
@@ -83,8 +138,25 @@ export default function ResultsPage() {
   ]
 
   return (
-    <PageTransition className="min-h-screen px-4 py-8 md:px-6">
+    <PageTransition className="min-h-screen px-4 py-8 md:px-6 relative">
       <Navbar backLabel="Home →" backHref="/" />
+
+      {/* Floating Toast Notification */}
+      <AnimatePresence>
+        {toastMessage && (
+          <motion.div
+            initial={{ opacity: 0, y: 50, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.9 }}
+            className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-2xl bg-zinc-900/95 text-white border border-white/20 shadow-2xl backdrop-blur-xl flex items-center gap-2.5 text-sm font-medium"
+          >
+            <div className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+              <Check className="w-3.5 h-3.5" />
+            </div>
+            <span>{toastMessage}</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       <div className="max-w-4xl mx-auto mt-28 md:mt-32 pb-20">
         <motion.div
@@ -143,7 +215,7 @@ export default function ResultsPage() {
           <motion.button
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
-            onClick={() => alert('Stack saved! (Account sync coming soon)')}
+            onClick={handleSave}
             className="btn-primary flex items-center justify-center gap-2"
           >
             <Save className="w-5 h-5" />
@@ -152,12 +224,8 @@ export default function ResultsPage() {
           <motion.button
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
-            onClick={() => {
-              const link = 'https://fintech-stack-optimizer.vercel.app/stack/' + Date.now()
-              navigator.clipboard.writeText(link)
-              alert('Share link copied to clipboard!')
-            }}
-            className="btn-secondary flex items-center justify-center gap-2"
+            onClick={handleShare}
+            className="btn-secondary flex items-center justify-center gap-2 cursor-pointer"
           >
             <Share2 className="w-5 h-5" />
             Share Stack
@@ -176,4 +244,3 @@ export default function ResultsPage() {
     </PageTransition>
   )
 }
-
